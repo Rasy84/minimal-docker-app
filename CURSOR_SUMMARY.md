@@ -92,18 +92,20 @@ git branch -M main
 git remote add origin https://github.com/Rasy84/daily-mileage-app.git
 git fetch origin
 git push -u origin main --force
+git add CURSOR_SUMMARY.md
+git commit -m "Add CURSOR_SUMMARY.md for session documentation"
+git push origin main
 ```
 
 The remote **main** branch was **force-updated** so the old minimal app history on GitHub was replaced by this repository state. The GitHub repository was **not** deleted and recreated; overwriting via `git push --force` was sufficient.
 
 ## GitHub push result
 
-- **Succeeded:** `main` pushed to `https://github.com/Rasy84/daily-mileage-app.git` (forced update from `80906ab` to `e2f1131` at time of push).
+- **Succeeded:** `main` pushed to `https://github.com/Rasy84/daily-mileage-app.git` (forced update from `80906ab` to `e2f1131`, then follow-up commit `5faa293` including `CURSOR_SUMMARY.md`).
 
 ## Issues / blockers
 
 1. **`Minimal App\minimal-docker-app`** could not be deleted while locked; remove manually after closing the locking program.
-2. **`CURSOR_SUMMARY.md`** was added after the first commit; a follow-up commit may be needed to include it on GitHub.
 
 ## Verification notes (session)
 
