@@ -1,0 +1,17 @@
+name: daily-mileage-app
+
+services:
+  web:
+    build: .
+    image: daily-mileage-app:latest
+    container_name: daily-mileage-app
+    ports:
+      - "5050:5000"
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+    volumes:
+      - mileage_instance:/app/instance
+
+volumes:
+  mileage_instance:

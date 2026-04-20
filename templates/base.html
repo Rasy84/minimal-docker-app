@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Daily Mileage Calculation App{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="bg-glow bg-glow--1" aria-hidden="true"></div>
+    <div class="bg-glow bg-glow--2" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="topbar__inner">
+        <a class="brand" href="{{ url_for('index') }}">
+          <span class="brand__mark" aria-hidden="true"></span>
+          <span class="brand__text">
+            <span class="brand__title">Daily Mileage</span>
+            <span class="brand__subtitle">Calculation App</span>
+          </span>
+        </a>
+        <nav class="nav" aria-label="Primary">
+          <a class="nav__link" href="{{ url_for('index') }}">Dashboard</a>
+          <a class="nav__link" href="#about">About</a>
+          <a class="nav__link nav__link--ghost" href="{{ url_for('health') }}"
+            >Health</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <main class="main" id="main">{% block content %}{% endblock %}</main>
+
+    <footer class="footer" id="about">
+      <div class="footer__inner">
+        <div class="footer__card glass">
+          <h2 class="footer__heading">About this app</h2>
+          <p class="footer__text">
+            Track how far you drove, your vehicle’s miles per gallon, and the
+            price you paid at the pump. The app estimates
+            <strong>gallons used</strong>, <strong>total fuel cost</strong>, and
+            <strong>cost per mile</strong>, then keeps a simple history so you
+            can compare trips over time.
+          </p>
+          <p class="footer__meta">
+            Built with Flask, SQLite, and Jinja — portfolio-ready and easy to
+            run locally or in Docker Desktop.
+          </p>
+        </div>
+        <p class="footer__copy">
+          © 2026 Daily Mileage Calculation App ·
+          <span class="mono">daily-mileage-app</span>
+        </p>
+      </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>

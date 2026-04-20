@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="hero">
+    <div class="hero__copy">
+      <p class="eyebrow">Fuel &amp; distance</p>
+      <h1 class="hero__title">Plan smarter trips with clear cost per mile.</h1>
+      <p class="hero__lead">
+        Enter today’s miles, your MPG, and local gas price. Save each trip to
+        build a history and see totals at a glance.
+      </p>
+    </div>
+  </section>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-stack" role="status" aria-live="polite">
+        {% for category, message in messages %}
+          <div class="flash flash--{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="layout">
+    <section class="card glass card--calc" aria-labelledby="calc-heading">
+      <div class="card__header">
+        <h2 id="calc-heading" class="card__title">Trip calculator</h2>
+        <p class="card__hint">All fuel values must be greater than zero.</p>
+      </div>
+      <form
+        id="trip-form"
+        class="form"
+        method="post"
+        action="{{ url_for('calculate') }}"
+        novalidate
+      >
+        <div class="form__grid">
+          <label class="field">
+            <span class="field__label">Date</span>
+            <input
+              class="field__input"
+              type="date"
+              name="entry_date"
+              value="{{ today_iso }}"
+              required
+            />
+          </label>
+          <label class="field">
+            <span class="field__label">Miles driven</span>
+            <input
+              class="field__input"
+              type="text"
+              name="miles_driven"
+              inputmode="decimal"
+              placeholder="e.g. 42.5"
+              autocomplete="off"
+              required
+            />
+          </label>
+          <label class="field">
+            <span class="field__label">Vehicle MPG</span>
+            <input
+              class="field__input"
+              type="text"
+              name="mpg"
+              inputmode="decimal"
+              placeholder="e.g. 28"
+              autocomplete="off"
+              required
+            />
+          </label>
+          <label class="field">
+            <span class="field__label">Gas price ($ / gal)</span>
+            <input
+              class="field__input"
+              type="text"
+              name="gas_price"
+              inputmode="decimal"
+              placeholder="e.g. 3.45"
+              autocomplete="off"
+              required
+            />
+          </label>
+        </div>
+        <div class="form__actions">
+          <button type="submit" class="btn btn--primary">
+            Calculate &amp; save
+          </button>
+          <p class="form__note">
+            Saves this trip to your history with gallons, total cost, and cost
+            per mile.
+          </p>
+        </div>
+      </form>
+    </section>
+
+    <aside class="card glass card--tips" aria-label="How it works">
+      <h3 class="tips__title">Formulas</h3>
+      <ul class="tips__list">
+        <li><span class="mono">gallons = miles ÷ MPG</span></li>
+        <li><span class="mono">total = gallons × price/gal</span></li>
+        <li><span class="mono">$/mile = total ÷ miles</span></li>
+      </ul>
+      <p class="tips__note">
+        Summary cards use <strong>all saved entries</strong>: total miles,
+        total spend, and a weighted average cost per mile.
+      </p>
+    </aside>
+  </div>
+
+  <section class="section" aria-labelledby="summary-heading">
+    <div class="section__head">
+      <h2 id="summary-heading" class="section__title">Summary</h2>
+      <p class="section__sub">Roll-up across your saved trips.</p>
+    </div>
+    <div class="summary-grid">
+      <article class="stat glass">
+        <p class="stat__label">Total miles</p>
+        <p class="stat__value">
+          {{ "%.2f"|format(summary.total_miles) }}
+        </p>
+      </article>
+      <article class="stat glass">
+        <p class="stat__label">Total gas spend</p>
+        <p class="stat__value">
+          ${{ "%.2f"|format(summary.total_spend) }}
+        </p>
+      </article>
+      <article class="stat glass">
+        <p class="stat__label">Avg. cost / mile</p>
+        <p class="stat__value">
+          ${{ "%.2f"|format(summary.avg_cost_per_mile) }}
+        </p>
+      </article>
+      <article class="stat glass">
+        <p class="stat__label">Entries saved</p>
+        <p class="stat__value stat__value--int">
+          {{ summary.entry_count }}
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section section--table" aria-labelledby="history-heading">
+    <div class="section__head">
+      <h2 id="history-heading" class="section__title">History</h2>
+      <p class="section__sub">Newest trips first. Delete a row you no longer need.</p>
+    </div>
+
+    {% if entries %}
+      <div class="table-wrap glass">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col" class="num">Miles</th>
+              <th scope="col" class="num">MPG</th>
+              <th scope="col" class="num">$/gal</th>
+              <th scope="col" class="num">Gal used</th>
+              <th scope="col" class="num">Total $</th>
+              <th scope="col" class="num">$/mile</th>
+              <th scope="col"><span class="sr-only">Delete</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in entries %}
+              <tr>
+                <td class="nowrap">{{ row.entry_date }}</td>
+                <td class="num">{{ "%.2f"|format(row.miles_driven) }}</td>
+                <td class="num">{{ "%.2f"|format(row.mpg) }}</td>
+                <td class="num">${{ "%.2f"|format(row.gas_price) }}</td>
+                <td class="num">{{ "%.2f"|format(row.gallons_used) }}</td>
+                <td class="num">${{ "%.2f"|format(row.total_cost) }}</td>
+                <td class="num">${{ "%.2f"|format(row.cost_per_mile) }}</td>
+                <td class="actions">
+                  <form
+                    method="post"
+                    action="{{ url_for('delete_entry', entry_id=row.id) }}"
+                    class="inline-form"
+                    onsubmit="return confirm('Remove this entry from history?');"
+                  >
+                    <button type="submit" class="btn btn--danger btn--sm">
+                      Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty glass">
+        <p class="empty__title">No trips yet</p>
+        <p class="empty__text">
+          Use the calculator above to save your first mileage entry.
+        </p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}
