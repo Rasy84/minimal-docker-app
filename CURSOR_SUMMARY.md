@@ -101,7 +101,7 @@ The remote **main** branch was **force-updated** so the old minimal app history 
 
 ## GitHub push result
 
-- **Succeeded:** `main` pushed to `https://github.com/Rasy84/daily-mileage-app.git` (forced update from `80906ab` to `e2f1131`, then follow-up commit `5faa293` including `CURSOR_SUMMARY.md`).
+- **Succeeded:** `main` pushed to `https://github.com/Rasy84/daily-mileage-app.git` (forced update replacing prior `main`, plus follow-up commits including `CURSOR_SUMMARY.md`).
 
 ## Issues / blockers
 
